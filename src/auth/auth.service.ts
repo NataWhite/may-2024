@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import {ForgotPassword} from "../user/dto/user.dto";
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
+  create(data: ForgotPassword) {
+    if (data.password !== data.repeatPassword) {
+
+    }
     return 'This action adds a new auth';
   }
 

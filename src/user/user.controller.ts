@@ -1,7 +1,18 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Query} from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpStatus,
+  Query,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-import {UserDto, AccountResponseDto, UserQueryDto} from './dto/user.dto';
-import {ApiParam, ApiQuery, ApiResponse, ApiTags} from "@nestjs/swagger";
+import { UserDto, AccountResponseDto } from './dto/user.dto';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { BaseQueryDto } from '../common/validator/base.query.validator';
 
 @ApiTags('User')
 @Controller('user')
@@ -14,10 +25,8 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-
-  // @ApiQuery({ name: 'limit', example: 10 })
   @Get('/list')
-  findAll(@Query() query: UserQueryDto) {
+  findAll(@Query() query: BaseQueryDto) {
     return this.userService.findAll(query);
   }
 
@@ -26,7 +35,6 @@ export class UserController {
     return this.userService.findOne(Number(id));
   }
 
-  // @ApiParam({ required: true })
   @Patch(':id')
   update(@Param('id') id: string) {
     return this.userService.update(+id);

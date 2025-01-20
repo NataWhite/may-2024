@@ -1,14 +1,15 @@
-import { ApiProperty, IntersectionType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
-  IsNumberString,
+  IsNumber,
   IsOptional,
-  IsString, IsStrongPassword, Matches,
+  IsString,
+  Matches,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import {Match} from "../../common/decorator/password.decorator";
-import {IsCityAllowed} from "../../common/decorator/city.decorator";
+import { Match } from '../../common/decorator/password.decorator';
+import { IsCityAllowed } from '../../common/decorator/city.decorator';
 
 export class UserDto {
   @IsString()
@@ -19,8 +20,14 @@ export class UserDto {
   email: string;
 
   @IsOptional()
+  @IsString()
   @ApiProperty({ required: false })
   firstName: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ required: false })
+  lastName: string;
 
   @ApiProperty({
     default: 'Lviv',
@@ -28,47 +35,49 @@ export class UserDto {
     description: 'User city',
     example: 'Poltava',
   })
+  @IsOptional()
   @IsCityAllowed({
     groups: ['Lviv', 'Odessa', 'Kharkiv'],
     message: 'City is not allowed',
   })
   city: string;
 
-  @ApiProperty()
+  @IsString()
+  @Matches(/^\S*(?=\S{8,})(?=\S*[A-Z])(?=\S*[\d])\S*$/, {
+    message: 'Password must have 1 upper case',
+  })
+  @IsNotEmpty()
   password: string;
 
-  @IsNumberString()
+  @IsNumber()
+  @IsOptional()
   @ApiProperty()
-  age: string;
-}
-
-export class PersonalDto {
-  dateBirth: string;
-  lang: string;
+  age: number;
 }
 
 export class ForgotPassword {
   @IsString()
   // @IsStrongPassword()
   @Matches(/^\S*(?=\S{8,})(?=\S*[A-Z])(?=\S*[\d])\S*$/, {
-    message: 'Password must have 1 upper case1111',
+    message: 'Password must have 1 upper case',
   })
   password: string;
 
   @IsNotEmpty()
-  @Match('password', { message: 'Password must match'})
+  @Match('password', { message: 'Password must match' })
   repeatPassword: string;
 }
 
-export class AccountResponseDto extends IntersectionType(UserDto, PersonalDto) {
+export class AccountResponseDto extends UserDto {
   @ApiProperty()
   status: boolean;
 }
 
-export class UserQueryDto {
+export class SingUpDto {
   @ApiProperty()
-  limit: string;
+  id: string;
   @ApiProperty()
-  sort: string;
-  page: string;
+  email: string;
+  @ApiProperty()
+  createdAt: Date;
 }

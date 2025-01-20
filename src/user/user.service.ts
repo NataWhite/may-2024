@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import {UserDto, UserQueryDto} from './dto/user.dto';
+import { UserDto } from './dto/user.dto';
+import { BaseQueryDto } from '../common/validator/base.query.validator';
 
 @Injectable()
 export class UserService {
@@ -13,7 +14,7 @@ export class UserService {
     return this.usersList[0];
   }
 
-  findAll(data: UserQueryDto) {
+  findAll(data: BaseQueryDto) {
     return this.usersList;
   }
 

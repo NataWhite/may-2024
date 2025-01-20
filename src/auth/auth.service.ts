@@ -1,13 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
-import {ForgotPassword} from "../user/dto/user.dto";
+import { ForgotPassword, SingUpDto, UserDto } from '../user/dto/user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../database/entities/user.entity';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  async singUpUser(data: UserDto): Promise<SingUpDto> {
+    const password = await bcrypt.hash(data.password, 10);
+    const user: User = await this.userRepository.save(
+      this.userRepository.create({ ...data, password }),
+    );
+    return {
+      id: user.id,
+      email: user.email,
+      createdAt: user.createdAt,
+    };
+  }
+
   create(data: ForgotPassword) {
     if (data.password !== data.repeatPassword) {
-
     }
     return 'This action adds a new auth';
   }

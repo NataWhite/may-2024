@@ -3,6 +3,7 @@ import { IsEnum, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class BaseQueryDto {
   @ApiProperty({ required: false })
+  @IsOptional()
   @IsNumberString()
   sort: string;
 
@@ -13,11 +14,11 @@ export class BaseQueryDto {
 
   @ApiProperty({ required: false, default: 1 })
   @IsOptional()
-  page = 1;
+  page: string;
 
   @ApiProperty({ required: false, default: 10 })
   @IsOptional()
-  limit = 10;
+  limit: string;
 
   @ApiProperty({ required: false })
   @IsString()

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import {UserDto, UserItemDto} from './dto/user.dto';
+import { UserDto, UserItemDto } from './dto/user.dto';
 import { BaseQueryDto } from '../common/validator/base.query.validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../database/entities/user.entity';
 import { Repository } from 'typeorm';
 import { paginateRawAndEntities } from 'nestjs-typeorm-paginate';
-import {PaginatedDto} from "../common/interface/response.interface";
+import { PaginatedDto } from '../common/interface/response.interface';
 
 @Injectable()
 export class UserService {

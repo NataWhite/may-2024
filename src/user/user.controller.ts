@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   HttpStatus,
-  Query,
+  Query, UseGuards, Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto, AccountResponseDto, UserItemDto } from './dto/user.dto';
@@ -17,7 +17,11 @@ import {
   ApiPaginatedResponse,
   PaginatedDto,
 } from '../common/interface/response.interface';
+import {AuthGuard} from "@nestjs/passport";
+import {Roles} from "../common/decorator/roles.decorator";
+import {RoleGuard} from "../common/guards/role.guard";
 
+// @UseGuards(AuthGuard())
 @ApiTags('User')
 @ApiExtraModels(UserItemDto, PaginatedDto)
 @Controller('user')
@@ -30,6 +34,8 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Roles('Admin', 'Manager')
+  @UseGuards(AuthGuard(), RoleGuard)
   @ApiPaginatedResponse('entities', UserItemDto)
   @Get('/list')
   findAll(@Query() query: BaseQueryDto) {
@@ -41,7 +47,9 @@ export class UserController {
     return this.userService.findOne(Number(id));
   }
 
-  @Patch(':id')
+  @Roles('Admin')
+  @UseGuards(AuthGuard(), RoleGuard)
+  @Patch('/roles/:id')
   update(@Param('id') id: string) {
     return this.userService.update(+id);
   }

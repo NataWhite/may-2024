@@ -24,7 +24,7 @@ export class UserService {
     return this.usersList[0];
   }
 
-  async findAll(query?: BaseQueryDto): Promise<any> {
+  async findAll(query?: BaseQueryDto, user?: any): Promise<any> {
     const options = {
       page: +query?.page || 1,
       limit: +query?.limit || 10,

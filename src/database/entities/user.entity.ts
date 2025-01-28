@@ -31,6 +31,9 @@ export class User extends BaseEntity {
   @Column({ nullable: true, default: null })
   phone: string;
 
+  @Column({ nullable: true })
+  avatar: string;
+
   @Column({ default: 'User' })
   role: string;
 

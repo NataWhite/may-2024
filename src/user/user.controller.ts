@@ -7,7 +7,15 @@ import {
   Param,
   Delete,
   HttpStatus,
-  Query, UseGuards, Req,
+  Query,
+  UseGuards,
+  Req,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+  UploadedFiles,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto, AccountResponseDto, UserItemDto } from './dto/user.dto';
@@ -20,6 +28,9 @@ import {
 import {AuthGuard} from "@nestjs/passport";
 import {Roles} from "../common/decorator/roles.decorator";
 import {RoleGuard} from "../common/guards/role.guard";
+import {FileFieldsInterceptor, FileInterceptor} from "@nestjs/platform-express";
+import {diskStorage} from "multer";
+import {editFileName, PATH_TO_IMAGE} from "../common/utils/upload.utils";
 
 // @UseGuards(AuthGuard())
 @ApiTags('User')
@@ -42,9 +53,55 @@ export class UserController {
     return this.userService.findAll(query);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(Number(id));
+  @Patch('avatar')
+  @UseInterceptors(FileInterceptor(
+      'image',
+      {
+        storage: diskStorage({
+          destination: `.${PATH_TO_IMAGE}`,
+          filename: editFileName,
+        })
+      }
+  ))
+  updateAvatar(
+      @Param('id') id: string,
+      @UploadedFile(
+          new ParseFilePipe({
+           validators: [
+             new MaxFileSizeValidator({ maxSize: 1000000000 }),   // bytes
+             new FileTypeValidator({ fileType: 'image/png' }),
+           ]
+          })
+      ) file: Express.Multer.File,
+  ) {
+    return this.userService.findOne(Number(id), file.filename);
+  }
+
+  @Patch('gallery')
+  @UseInterceptors(FileFieldsInterceptor(
+      [
+        {name: 'image', maxCount: 1},
+        {name: 'imageLogo', maxCount: 1}
+      ],
+      {
+        storage: diskStorage({
+          destination: `.${PATH_TO_IMAGE}`,
+          filename: editFileName,
+        })
+      }
+  ))
+  updateImages(
+      @Param('id') id: string,
+      @UploadedFiles() files: { image?: Express.Multer.File[], imageLogo?: Express.Multer.File[]},
+      @Body() body: any,
+  ) {
+    if (files?.image) {
+      body.photo = `${PATH_TO_IMAGE}/${files.image[0].filename}`;
+    }
+    if (files?.imageLogo) {
+      body.logo = `${PATH_TO_IMAGE}/${files.imageLogo[0].filename}`;
+    }
+    return this.userService.updateOne(Number(id), body);
   }
 
   @Roles('Admin')

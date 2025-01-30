@@ -23,9 +23,9 @@ export class AuthController {
     return this.authService.singUpUser(body);
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+  @Post('login')
+  async login(@Body() body: any) {
+    return this.authService.login(body);
   }
 
   @Get(':id')

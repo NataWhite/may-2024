@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from './common/config/configuration';
 import { DatabaseModule } from './database/database.module';
 import {RedisModule} from "@webeleon/nestjs-redis";
+import {SocketModule} from "./socket/socket.module";
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import {RedisModule} from "@webeleon/nestjs-redis";
       isGlobal: true,
     }),
     DatabaseModule,
+      SocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],

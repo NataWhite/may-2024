@@ -77,6 +77,7 @@ export class UserController {
     return this.userService.findOne(Number(id), file.filename);
   }
 
+  @UseGuards(AuthGuard())
   @Patch('gallery')
   @UseInterceptors(FileFieldsInterceptor(
       [
@@ -94,6 +95,7 @@ export class UserController {
       @Param('id') id: string,
       @UploadedFiles() files: { image?: Express.Multer.File[], imageLogo?: Express.Multer.File[]},
       @Body() body: any,
+      @Req() req: any,
   ) {
     if (files?.image) {
       body.photo = `${PATH_TO_IMAGE}/${files.image[0].filename}`;
@@ -101,7 +103,7 @@ export class UserController {
     if (files?.imageLogo) {
       body.logo = `${PATH_TO_IMAGE}/${files.imageLogo[0].filename}`;
     }
-    return this.userService.updateOne(Number(id), body);
+    return this.userService.updateOne(Number(id), body, req.user);
   }
 
   @Roles('Admin')

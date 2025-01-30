@@ -65,6 +65,40 @@ export class AuthService {
     return this.jwtService.sign({id: userId, email: userEmail});
   }
 
+  async compareHash(password: string, hash: string) {
+    return bcrypt.compare(password, hash);
+  }
+
+  async login(data: any) {
+    const findUser = await this.userRepository.findOne({
+      where: { email: data.email },
+    })
+
+    if (!findUser) {
+      throw new BadRequestException('Wrong email or password.');
+    }
+
+    if (!await this.compareHash(data.password, findUser.password)) {
+      throw new BadRequestException('Wrong email or password.');
+    }
+
+    const token = await this.singIn(findUser.id, findUser.email);
+
+    await this.redisClient.setEx(`${this.redisUserKey}-${findUser.id}`, 24 * 60 * 60, token);
+
+    return { accessToken: token };
+
+  }
+
+  async validate(token: string) {
+    try {
+      return this.jwtService.verifyAsync(token);
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
   create(data: ForgotPassword) {
     if (data.password !== data.repeatPassword) {
     }
